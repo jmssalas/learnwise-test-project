@@ -22,13 +22,13 @@ class SQLite(DatabaseInterface):
             autoflush=False,
             autocommit=False,
         )
-        self.__db = self.SessionLocal()
+        self.db = self.SessionLocal()
 
     def create(self, data: dict) -> dict:
         conversation = Conversation(**self.__normalize_data(data))
-        self.__db.add(conversation)
-        self.__db.commit()
-        self.__db.refresh(conversation)
+        self.db.add(conversation)
+        self.db.commit()
+        self.db.refresh(conversation)
         return self.__serialize(conversation)
 
     def update(self, data: dict) -> dict:
@@ -36,7 +36,7 @@ class SQLite(DatabaseInterface):
         if not conversation_id:
             raise ValueError("Conversation id is required")
 
-        conversation = self.__db.get(Conversation, conversation_id)
+        conversation = self.db.get(Conversation, conversation_id)
         if conversation is None:
             raise ValueError(f"Conversation not found: {conversation_id}")
 
@@ -44,18 +44,18 @@ class SQLite(DatabaseInterface):
             if field != "id":
                 setattr(conversation, field, value)
 
-        self.__db.commit()
-        self.__db.refresh(conversation)
+        self.db.commit()
+        self.db.refresh(conversation)
         return self.__serialize(conversation)
 
     def list(self) -> list[dict]:
-        conversations = self.__db.scalars(
+        conversations = self.db.scalars(
             select(Conversation).order_by(Conversation.created_at)
         ).all()
         return [self.__serialize(conversation) for conversation in conversations]
 
     def close(self) -> None:
-        self.__db.close()
+        self.db.close()
         self.engine.dispose()
 
     @staticmethod
