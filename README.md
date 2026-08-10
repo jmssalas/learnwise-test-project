@@ -49,3 +49,7 @@ alembic revision --autogenerate -m "describe the change"
 
 Review the generated file in `alembic/versions` and then apply it with
 `alembic upgrade head`.
+
+
+## Future improvements
+- Add Database Factory and better handling of database connections, creations, and migrations.
