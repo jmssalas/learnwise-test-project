@@ -5,6 +5,7 @@ from typing import Any
 from sqlalchemy import create_engine, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from .database_interface import DatabaseInterface
 from .models import Conversation
@@ -12,8 +13,13 @@ from .models import Conversation
 
 class SQLite(DatabaseInterface):
     def __init__(self, database_url: str):
-        self.engine = create_engine(database_url, connect_args={
-                                    "check_same_thread": False})
+        engine_options = {}
+        if database_url.startswith("sqlite"):
+            engine_options["connect_args"] = {"check_same_thread": False}
+            if database_url == "sqlite:///:memory:":
+                engine_options["poolclass"] = StaticPool
+
+        self.engine = create_engine(database_url, **engine_options)
         self.SessionLocal = sessionmaker(
             bind=self.engine,
             autoflush=False,
