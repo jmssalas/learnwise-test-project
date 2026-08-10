@@ -6,13 +6,22 @@ app = FastAPI(
 )
 
 
-@app.get("/", tags=["health"])
-async def read_root() -> dict[str, str]:
-    """Return a basic service description."""
-    return {"message": "Learnwise API"}
+@app.post("/sms", tags=["sms"])
+async def sms() -> dict[str, str]:
+    """Receive incoming SMS messages from the SMS Provider."""
+    # @TODO: Implement SMS receiving logic here
+    return {"status": "@TODO"}
 
 
-@app.get("/health", tags=["health"])
-async def health_check() -> dict[str, str]:
-    """Report whether the API is ready to receive requests."""
-    return {"status": "ok"}
+@app.post("/feedback", tags=["sms"])
+async def feedback() -> dict[str, str]:
+    """Receive feedback of the most recent conversation."""
+    # @TODO: Implement SMS receiving logic here
+    return {"status": "@TODO"}
+
+
+@app.get("/admin/conversations", tags=["admin"])
+async def conversations(phoneNumber: str) -> list[dict]:
+    """Retrieve a list of all conversations of the phone number provided."""
+    # @TODO: Implement SMS receiving logic here
+    return [{"status": "@TODO"}]
