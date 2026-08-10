@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.models.sms import SMS
+from app.schemas.sms import SMS
 from app.services.llm.llm_service_factory import LLMServiceFactory
 from app.services.llm.mock_llm_service import MockLLMService
 
