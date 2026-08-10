@@ -1,26 +1,53 @@
-from fastapi import APIRouter
+from datetime import datetime
+import os
 
+from fastapi import APIRouter
+from dotenv import load_dotenv
+
+from app.db.sqlite import SQLite
 from app.schemas.sms import SMS
+from app.schemas.conversation import Conversation
 from app.services.llm.llm_service_factory import LLMServiceFactory
-from app.services.llm.mock_llm_service import MockLLMService
+from app.services.storage.storage_service import StorageService
 
 router = APIRouter(
     prefix="/v1/sms",
     tags=["sms"]
 )
 
+load_dotenv()
+
+database_url = os.getenv("DATABASE_URL")
+database = SQLite(database_url)
+storage = StorageService(database)
+
+type = os.getenv("LLM_SERVICE")
+llmService = LLMServiceFactory.create(type=type)
+
 
 @router.post("/")
-async def sms(sms: SMS) -> dict[str, str]:
+async def sms(sms: SMS) -> Conversation:
     """Receive incoming SMS messages from the SMS Provider."""
 
-    type = "mock" # @TODO: Read this from .env file
-    llmService = LLMServiceFactory.create(type=type)
-    response = llmService.generate_response()
+    # @TODO: Handle errors and exceptions
 
-    # @TODO: Store the incoming message and the response in the database
+    conversation = storage.createConversation({
+        "phoneNumber": sms.phoneNumber,
+        "incomingMessage": sms.body,
+        "providerMessageId": sms.messageId,
+        "status": "pending",
+        "llmResponse": "",
+        "createdAt": sms.timestamp or datetime.now().isoformat(),
+    })
 
-    return {"status": "ok", "response": response}
+    response = llmService.generate_response(conversation.incomingMessage)
+
+    conversation = storage.updateConversation(conversation.id, {
+        "llmResponse": response,
+        "status": "llmResponsed",
+    })
+
+    return conversation
 
 
 @router.post("/feedback")
