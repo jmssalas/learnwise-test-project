@@ -34,11 +34,12 @@ pytest
 Apply pending SQLite migrations with:
 
 ```bash
+cp .env.example .env
 alembic upgrade head
 ```
 
-The database path defaults to `learnwise.db` and can be configured with
-`DATABASE_URL`.
+Define `DATABASE_URL` in `.env`. It is required and supports any SQLAlchemy
+database URL. The `.env` file is ignored by Git.
 
 Generate a migration after changing the SQLAlchemy models with:
 
