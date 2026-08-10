@@ -13,3 +13,4 @@ class Conversation(BaseModel):
     providerMessageId: str
     status: str
     createdAt: datetime
+    feedback: str

@@ -14,3 +14,7 @@ class DatabaseInterface(ABC):
     @abstractmethod
     def list(self) -> list[Conversation]:
         pass
+
+    @abstractmethod
+    def getLastByPhoneNumber(self, phone_number: str) -> Conversation | None:
+        pass

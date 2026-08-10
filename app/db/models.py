@@ -27,3 +27,4 @@ class Conversation(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+    feedback: Mapped[str] = mapped_column(String, nullable=False, default="none")

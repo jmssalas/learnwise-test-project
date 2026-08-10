@@ -55,6 +55,14 @@ class SQLite(DatabaseInterface):
         ).all()
         return [self.__serialize(conversation) for conversation in conversations]
 
+    def getLastByPhoneNumber(self, phone_number: str) -> Conversation | None:
+        conversation = self.db.scalars(
+            select(Conversation)
+            .where(Conversation.phone_number == phone_number)
+            .order_by(Conversation.created_at.desc())
+        ).first()
+        return self.__serialize(conversation) if conversation else None
+
     def close(self) -> None:
         self.db.close()
         self.engine.dispose()
@@ -73,6 +81,7 @@ class SQLite(DatabaseInterface):
             ),
             "status": data.get("status"),
             "created_at": data.get("created_at", data.get("createdAt")),
+            "feedback": data.get("feedback"),
         }
 
         if isinstance(normalized["created_at"], str):
@@ -96,4 +105,5 @@ class SQLite(DatabaseInterface):
             "providerMessageId": conversation.provider_message_id,
             "status": conversation.status,
             "createdAt": created_at.isoformat(),
+            "feedback": conversation.feedback,
         }

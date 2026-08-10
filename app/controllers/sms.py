@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from app.db.sqlite import SQLite
 from app.schemas.sms import SMS
-from app.schemas.conversation import Conversation
+from app.schemas.feedback import Feedback
 from app.services.llm.llm_service_factory import LLMServiceFactory
 from app.services.sms.sms_provider_factory import SMSProviderFactory
 from app.services.storage.storage_service import StorageService
@@ -49,7 +49,7 @@ async def sms(sms: SMS) -> bool:
         "providerMessageId": sms.messageId,
         "status": STATUS["RECEIVED"],
         "llmResponse": "",
-        "createdAt": sms.timestamp or datetime.now().isoformat(),
+        "createdAt": sms.timestamp,
     })
 
     response = llmService.generate_response(conversation.incomingMessage)
@@ -69,7 +69,13 @@ async def sms(sms: SMS) -> bool:
 
 
 @router.post("/feedback")
-async def feedback() -> dict[str, str]:
+async def feedback(feedback: Feedback) -> bool:
     """Receive feedback of the most recent conversation."""
-    # @TODO: Implement SMS receiving logic here
-    return {"status": "@TODO"}
+
+    # @TODO: Handle errors and exceptions
+    result = storage.update_last_conversation_feedback(
+        feedback.phoneNumber, feedback.feedback)
+
+    # @TODO: Handle propertly the case when there is no conversation to update
+
+    return True if result is not None else False
