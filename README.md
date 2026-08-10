@@ -28,3 +28,23 @@ available at `/health`.
 ```bash
 pytest
 ```
+
+## Database migrations
+
+Apply pending SQLite migrations with:
+
+```bash
+alembic upgrade head
+```
+
+The database path defaults to `learnwise.db` and can be configured with
+`DATABASE_URL`.
+
+Generate a migration after changing the SQLAlchemy models with:
+
+```bash
+alembic revision --autogenerate -m "describe the change"
+```
+
+Review the generated file in `alembic/versions` and then apply it with
+`alembic upgrade head`.
