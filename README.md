@@ -4,6 +4,10 @@ Learnwise is a FastAPI service that receives SMS messages, sends them to an
 LLM service, sends the generated answer back through an SMS provider, and
 stores the conversation in a SQLAlchemy-managed database.
 
+## Architecture
+
+![Learnwise API architecture](assets/diagram.png)
+
 ## Requirements
 
 - Python 3.11 or newer
