@@ -1,16 +1,16 @@
 
 from abc import ABC, abstractmethod
-
+from app.db.models import Conversation
 
 class DatabaseInterface(ABC):
     @abstractmethod
-    def create(self, data: dict) -> dict:
+    def create(self, data: Conversation) -> Conversation:
         pass
 
     @abstractmethod
-    def update(self, data: dict) -> dict:
+    def update(self, id: str, data: Conversation) -> Conversation:
         pass
 
     @abstractmethod
-    def list(self) -> list[dict]:
+    def list(self) -> list[Conversation]:
         pass

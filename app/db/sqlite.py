@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from sqlalchemy import create_engine, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from .database_interface import DatabaseInterface
@@ -11,12 +12,8 @@ from .models import Conversation
 
 class SQLite(DatabaseInterface):
     def __init__(self, database_url: str):
-        connect_args = (
-            {"check_same_thread": False}
-            if database_url.startswith("sqlite")
-            else {}
-        )
-        self.engine = create_engine(database_url, connect_args=connect_args)
+        self.engine = create_engine(database_url, connect_args={
+                                    "check_same_thread": False})
         self.SessionLocal = sessionmaker(
             bind=self.engine,
             autoflush=False,
@@ -27,24 +24,28 @@ class SQLite(DatabaseInterface):
     def create(self, data: dict) -> dict:
         conversation = Conversation(**self.__normalize_data(data))
         self.db.add(conversation)
-        self.db.commit()
+        try:
+            self.db.commit()
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise
         self.db.refresh(conversation)
         return self.__serialize(conversation)
 
-    def update(self, data: dict) -> dict:
-        conversation_id = data.get("id")
-        if not conversation_id:
-            raise ValueError("Conversation id is required")
-
-        conversation = self.db.get(Conversation, conversation_id)
+    def update(self, id: str, data: dict) -> dict:
+        conversation = self.db.get(Conversation, id)
         if conversation is None:
-            raise ValueError(f"Conversation not found: {conversation_id}")
+            raise ValueError(f"Conversation not found: {id}")
 
         for field, value in self.__normalize_data(data).items():
             if field != "id":
                 setattr(conversation, field, value)
 
-        self.db.commit()
+        try:
+            self.db.commit()
+        except SQLAlchemyError:
+            self.db.rollback()
+            raise
         self.db.refresh(conversation)
         return self.__serialize(conversation)
 

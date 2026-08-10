@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import uuid
 
 from sqlalchemy import DateTime, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -11,7 +12,7 @@ class Base(DeclarativeBase):
 class Conversation(Base):
     __tablename__ = "conversations"
 
-    id: Mapped[str] = mapped_column(String, primary_key=True)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     phone_number: Mapped[str] = mapped_column(String, nullable=False, index=True)
     incoming_message: Mapped[str] = mapped_column(String, nullable=False)
     llm_response: Mapped[str] = mapped_column(String, nullable=False)
