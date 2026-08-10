@@ -1,24 +1,13 @@
 from fastapi import FastAPI
 
+from app.controllers import sms
+
 app = FastAPI(
     title="Learnwise API",
     version="0.1.0",
 )
 
-
-@app.post("/sms", tags=["sms"])
-async def sms() -> dict[str, str]:
-    """Receive incoming SMS messages from the SMS Provider."""
-    # @TODO: Implement SMS receiving logic here
-    return {"status": "@TODO"}
-
-
-@app.post("/feedback", tags=["sms"])
-async def feedback() -> dict[str, str]:
-    """Receive feedback of the most recent conversation."""
-    # @TODO: Implement SMS receiving logic here
-    return {"status": "@TODO"}
-
+app.include_router(sms.router)
 
 @app.get("/admin/conversations", tags=["admin"])
 async def conversations(phoneNumber: str) -> list[dict]:
