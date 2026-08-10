@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.models.sms import SMS
 from app.services.llm.llm_service_factory import LLMServiceFactory
 from app.services.llm.mock_llm_service import MockLLMService
 
@@ -10,12 +11,14 @@ router = APIRouter(
 
 
 @router.post("/")
-async def sms() -> dict[str, str]:
+async def sms(sms: SMS) -> dict[str, str]:
     """Receive incoming SMS messages from the SMS Provider."""
 
     type = "mock" # @TODO: Read this from .env file
     llmService = LLMServiceFactory.create(type=type)
     response = llmService.generate_response()
+
+    # @TODO: Store the incoming message and the response in the database
 
     return {"status": "ok", "response": response}
 
